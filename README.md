@@ -20,7 +20,14 @@ brew install sdl2{,_image,_mixer,_ttf,_gfx} pkg-config
 <sub>(Or live dangerously and run the pre-compiled darwin binary in `build/`)</sub>
 
 ## Input
-16 keys, 0 to F (8, 4, 6, 2 are sometimes used for direction input)
+
+**P** - Pause emulator processing
+
+**O** - Resume emulator processing
+
+**I** - Inspect state of emulator (see console)
+
+**Gamepad input:** 16 keys, 0 to F (8, 4, 6, 2 are sometimes used for direction input)
 
 ###### Original gamepad
 ```
@@ -91,7 +98,7 @@ Typically the stack is 48 bytes (12 levels * 4 address bits each). This implemen
 
 - [x] File-path argument
 - [ ] RESET key
-- [ ] Double buffering to prevent flickering
+- [ ] (maybe?) Double buffering to prevent flickering
 - [ ] Debug outputs
 - [ ] Audio beep
 - [ ] Tests

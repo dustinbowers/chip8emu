@@ -19,6 +19,9 @@ var keyMap map[int]uint8
 func main() {
 	var romPath string
 	romPath = "roms/games/Space Invaders [David Winter].ch8"
+	romPath = "roms/programs/Keypad Test [Hap, 2006].ch8"
+	romPath = "roms/programs/Clock Program [Bill Fisher, 1981].ch8"
+	romPath = "roms/programs/BC_test.ch8"
 	if len(os.Args) == 2 {
 		romPath = os.Args[1]
 	}
@@ -43,6 +46,7 @@ func main() {
 	defer ui.Cleanup()
 
 	running := true
+	paused := false
 	hz := 700
 	delay := time.Duration(1000 / hz)
 	go func() {
@@ -75,6 +79,26 @@ func main() {
 					running = false
 				}
 
+				if t.Keysym.Sym == sdl.K_p {
+					if !paused {
+						emu.Pause()
+						paused = true
+						log.Printf("-Paused-")
+					}
+				}
+				if t.Keysym.Sym == sdl.K_o {
+					if paused {
+						emu.Resume()
+						paused = false
+						log.Printf("Resuming")
+					}
+				}
+				if t.Keysym.Sym == sdl.K_i {
+					// inspect emulator state
+					log.Printf("Emulator state:\n%s", emu.Inspect())
+				}
+
+				// Send controller inputs if we have any
 				keyEventType := event.GetType()
 				k, ok := keyMap[int(t.Keysym.Sym)]
 				if !ok {

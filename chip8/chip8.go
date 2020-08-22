@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -55,6 +56,13 @@ Memory Map:
 */
 
 type Chip8 struct {
+
+	// See: https://en.wikipedia.org/wiki/CHIP-8#cite_note-increment-17
+	// In the original CHIP-8 implementation, and also in CHIP-48,
+	// I is left incremented after this instruction had been executed.
+	// In SCHIP, I is left unmodified.
+	schipMode bool
+
 	Screen   [64][32]uint8 // flags for pixel on/off
 	Memory   [4096]byte    // Program entry point is typically 0x200
 	V        [16]byte      // 16 8-bit registers (note VF is a carry-flag register)
@@ -76,10 +84,24 @@ type Chip8 struct {
 	keyboard [16]bool // Keys range from 0-F in a 4x4 grid
 
 	// internals for easier opcode processing (See: func fetchOpcode())
-	lastKey     *uint8 // Used for interrupting an input block (see Fx0A - LD Vx, K below)
+	lastKey     *uint8 // Used for interrupting an 'block for input' (see Fx0A - LD Vx, K below)
 	opcode      uint16 // Stores the current 2byte opcode
 	x, y, n, kk uint8  // various parts of the current opcode, used for easier processing
 	nnn         uint16 // Stores addresses from opcodes
+
+	wg *sync.WaitGroup
+}
+
+func (ch *Chip8) Inspect() (state string) {
+	state += fmt.Sprintf("Opcode: 0x%x\n", ch.opcode)
+	state += fmt.Sprintf("V     : %v\n", ch.V)
+	state += fmt.Sprintf("Stack : %v\n", ch.Stack)
+	state += fmt.Sprintf("SP    : %v\n", ch.SP)
+	state += fmt.Sprintf("I     : %v\n", ch.I)
+	state += fmt.Sprintf("PC    : %v\n", ch.PC)
+	state += fmt.Sprintf("ST    : %v\n", ch.ST)
+	state += fmt.Sprintf("DT    : %v\n", ch.DT)
+	return state
 }
 
 func (ch *Chip8) Initialize() {
@@ -89,11 +111,26 @@ func (ch *Chip8) Initialize() {
 		ch.Memory[i+0x050] = b
 	}
 
+	ch.schipMode = true
+
 	// Set Entrypoint
 	ch.PC = 0x200
 
 	// Start subroutine for Delay timer and Sound Timer
 	ch.startClock()
+}
+
+func (ch* Chip8) Pause() {
+	if ch.wg != nil {
+		return
+	}
+	ch.wg = &sync.WaitGroup{}
+	ch.wg.Add(1)
+}
+
+func (ch* Chip8) Resume() {
+	ch.wg.Done()
+	ch.wg = nil
 }
 
 func (ch *Chip8) LoadRom(filepath string) error {
@@ -110,8 +147,9 @@ func (ch *Chip8) LoadRom(filepath string) error {
 
 func (ch *Chip8) EmulateCycle() (bool, error) {
 	ch.fetchOpcode()
-
-	// Decode & Execute opcode
+	if ch.wg != nil {
+		ch.wg.Wait()
+	}
 	err := ch.executeOpcode()
 	if err != nil {
 		return false, err
@@ -154,7 +192,7 @@ func (ch *Chip8) executeOpcode() error {
 			ch.PC = ch.Stack[ch.SP]
 			ch.SP -= 1
 		default:
-			return fmt.Errorf("unknown opcode: %x", ch.opcode)
+			return fmt.Errorf("unknown opcode: 0x%x", ch.opcode)
 		}
 	case 0x1000: // 1nnn - JP addr
 		ch.PC = ch.nnn
@@ -204,11 +242,12 @@ func (ch *Chip8) executeOpcode() error {
 			ch.V[ch.x] = ch.V[ch.x] - ch.V[ch.y]
 		case 0x6: // 8xy6 - SHR Vx {, Vy}
 			// TODO: 'VF = Vx & 0x1'
-			if ch.V[ch.x]&0x1 == 1 {
+			/*if ch.V[ch.x]&0x1 == 1 {
 				ch.V[0xF] = 1
 			} else {
 				ch.V[0xF] = 0
-			}
+			}*/
+			ch.V[0xF] = ch.V[ch.x] & 0x1
 			ch.V[ch.x] = ch.V[ch.x] >> 1
 		case 0x7: // 8xy7 - SUBN Vx, Vy
 			if ch.V[ch.y] > ch.V[ch.x] {
@@ -219,11 +258,12 @@ func (ch *Chip8) executeOpcode() error {
 			ch.V[ch.x] = ch.V[ch.y] - ch.V[ch.x]
 		case 0xE: // 8xyE - SHL Vx {, Vy}
 			// TODO: 'VF = (Vx >> 7) & 0x1'
-			if (ch.V[ch.x]>>7)&0x1 == 1 {
-				ch.V[0xF] = 1
-			} else {
-				ch.V[0xF] = 0
-			}
+			//if (ch.V[ch.x]>>7)&0x1 == 1 {
+			//	ch.V[0xF] = 1
+			//} else {
+			//	ch.V[0xF] = 0
+			//}
+			ch.V[0xF] = (ch.V[ch.x] >> 7) & 0x1
 			ch.V[ch.x] = ch.V[ch.x] << 1
 		default:
 			return fmt.Errorf("unknown opcode: %x", ch.opcode)
@@ -319,12 +359,16 @@ func (ch *Chip8) executeOpcode() error {
 			for a := 0; a <= int(ch.x); a++ {
 				ch.Memory[ch.I+uint16(a)] = ch.V[a]
 			}
-			ch.I += uint16(ch.x) + 1
+			if ch.schipMode == false {
+				ch.I += uint16(ch.x) + 1
+			}
 		case 0x65: // Fx65 - LD Vx, [I]
 			for a := 0; a <= int(ch.x); a++ {
 				ch.V[a] = ch.Memory[ch.I+uint16(a)]
 			}
-			ch.I += uint16(ch.x) + 1
+			if ch.schipMode == false {
+				ch.I += uint16(ch.x) + 1
+			}
 		default:
 			return fmt.Errorf("unknown opcode: %x", ch.opcode)
 		}
@@ -344,6 +388,9 @@ func (ch *Chip8) KeyUp(key uint8) {
 func (ch *Chip8) startClock() {
 	go func() {
 		for {
+			if ch.wg != nil {
+				ch.wg.Wait()
+			}
 			ch.decrementTimers()
 			time.Sleep(time.Microsecond * 16700) // Clock timers run at 60 Hz
 		}
