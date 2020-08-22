@@ -1,6 +1,6 @@
 # Chip8 Emulator
 
-A super basic implementation of CHIP8. Nothin' fancy here
+A super basic emulation of CHIP8. Nothin' fancy here
 
 ![](screens/pong.png)
 
