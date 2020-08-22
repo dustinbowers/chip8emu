@@ -1,6 +1,6 @@
 # Chip8 Emulator
 
-A super basic implementation of CHIP8. Nothin' fancy here
+A super basic emulation of CHIP8. Nothin' fancy here
 
 ![](screens/pong.png)
 
@@ -17,7 +17,7 @@ brew install sdl2{,_image,_mixer,_ttf,_gfx} pkg-config
 - Run: `make run`
 
 ## Input
-16 keys, 0 to F (8, 4, 6, 2 are used for direction input)
+16 keys, 0 to F (8, 4, 6, 2 are sometimes used for direction input)
 
 ###### Original gamepad
 ```
