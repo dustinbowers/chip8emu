@@ -2,6 +2,8 @@
 
 A super basic implementation of CHIP8. Nothin' fancy here
 
+![](screens/pong.png)
+
 ## Usage
 
 `make run`

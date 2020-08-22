@@ -25,8 +25,8 @@ func main() {
 	//err := emu.LoadRom("roms/games/Addition Problems [Paul C. Moews].ch8")
 	//err := emu.LoadRom("roms/games/Space Flight.ch8")
 	//err := emu.LoadRom("roms/games/Cave.ch8")
-	//err := emu.LoadRom("roms/games/Pong (1 player).ch8")
-	err := emu.LoadRom("roms/games/Space Invaders [David Winter].ch8")
+	err := emu.LoadRom("roms/games/Pong (1 player).ch8")
+	//err := emu.LoadRom("roms/games/Space Invaders [David Winter].ch8")
 	//err := emu.LoadRom("roms/games/Tetris [Fran Dachille, 1991].ch8")
 	//err := emu.LoadRom("roms/games/Worm V4 [RB-Revival Studios, 2007].ch8")
 	if err != nil {
