@@ -3,6 +3,7 @@ package chip8
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -54,16 +55,16 @@ Memory Map:
 */
 
 type Chip8 struct {
-	Screen   [64][32]uint8 // flags for pixel on or off
+	Screen   [64][32]uint8 // flags for pixel on/off
 	Memory   [4096]byte    // Program entry point is typically 0x200
 	V        [16]byte      // 16 8-bit registers (note VF is a carry-flag register)
 	PC       uint16        // Program/Instruction counter
 	I        uint16        // Index register
 	SP       uint16        // Stack pointer
-	Stack    [16]uint16
-	DT       uint8 // Delay timer
-	ST       uint8 // Sound timer
-	DrawFlag bool  // Causes a redraw when set
+	Stack    [16]uint16	   // :pancakes:
+	DT       uint8         // Delay timer
+	ST       uint8         // Sound timer
+	DrawFlag bool          // Redraw when true
 
 	/*
 		Input: 16 keys, 0 to F (8, 4, 6, 2 are used for direction input)
@@ -74,15 +75,16 @@ type Chip8 struct {
 	*/
 	keyboard [16]bool // Keys range from 0-F in a 4x4 grid
 
-	// internals for easier opcode processing
+	// internals for easier opcode processing (See: func fetchOpcode())
 	lastKey     *uint8 // Used for interrupting an input block (see Fx0A - LD Vx, K below)
-	opcode      uint16 // Stores the current opcode. All opcodes are 2 bytes
+	opcode      uint16 // Stores the current 2byte opcode
 	x, y, n, kk uint8  // various parts of the current opcode, used for easier processing
 	nnn         uint16 // Stores addresses from opcodes
 }
 
 func (ch *Chip8) Initialize() {
-	// Load fontset into memory (16 8x5 sprites)
+	// Load fontset into memory (16 8bit*5 row sprites)
+	// Note: Spec says font sprites start at 0x050. Some emus start at 0x0
 	for i, b := range fontSet {
 		ch.Memory[i+0x050] = b
 	}
@@ -133,8 +135,8 @@ func (ch *Chip8) fetchOpcode() {
 	ch.n = pc1Byte & 0x0F        // lower 4 bits of low byte
 	ch.x = pcByte & 0x0F         // lower 4 bits of high byte
 	ch.y = (pc1Byte >> 4) & 0x0F // upper 4 bits of low byte
-	ch.kk = pc1Byte
-	ch.nnn = ch.opcode & 0x0FFF
+	ch.kk = pc1Byte				 // low byte
+	ch.nnn = ch.opcode & 0x0FFF  // lower 12 bits of opcode (for addresses into 2^12 bytes of memory)
 
 	ch.PC += 2 // Advance the program counter after we have the internals set for processing
 }
@@ -201,6 +203,7 @@ func (ch *Chip8) executeOpcode() error {
 			}
 			ch.V[ch.x] = ch.V[ch.x] - ch.V[ch.y]
 		case 0x6: // 8xy6 - SHR Vx {, Vy}
+			// TODO: 'VF = Vx & 0x1'
 			if ch.V[ch.x]&0x1 == 1 {
 				ch.V[0xF] = 1
 			} else {
@@ -215,6 +218,7 @@ func (ch *Chip8) executeOpcode() error {
 			}
 			ch.V[ch.x] = ch.V[ch.y] - ch.V[ch.x]
 		case 0xE: // 8xyE - SHL Vx {, Vy}
+			// TODO: 'VF = (Vx >> 7) & 0x1'
 			if (ch.V[ch.x]>>7)&0x1 == 1 {
 				ch.V[0xF] = 1
 			} else {
@@ -279,15 +283,17 @@ func (ch *Chip8) executeOpcode() error {
 		case 0x07: // Fx07 - LD Vx, DT
 			ch.V[ch.x] = ch.DT
 		case 0x0A: // Fx0A - LD Vx, K
-			fmt.Print("Waiting for keypress ")
+			// TODO: remove debug output and write proper tests
+			log.Print("Waiting for keypress ")
 			for {
 				if ch.lastKey == nil {
 					time.Sleep(time.Microsecond * 1600) // ~700 Hz
 					continue
 				}
 				ch.V[ch.x] = *ch.lastKey
-				fmt.Println("Got a keypress", ch.V[ch.x])
+				log.Println("Got a keypress", ch.V[ch.x])
 				ch.lastKey = nil
+				break
 			}
 		case 0x15: // Fx15 - LD DT, Vx
 			ch.DT = ch.V[ch.x]
@@ -296,6 +302,7 @@ func (ch *Chip8) executeOpcode() error {
 		case 0x1E: // Fx1E - ADD I, Vx
 			ch.I += uint16(ch.V[ch.x])
 
+			// TODO: Add a flag for this?
 			// See: https://en.wikipedia.org/wiki/CHIP-8#cite_note-16
 			//if ch.I > 0xFFF {
 			//	ch.V[0xF] = 1
@@ -343,11 +350,13 @@ func (ch *Chip8) startClock() {
 	}()
 }
 
+// Timers run at 60hz and 'deactivate' at 0
 func (ch *Chip8) decrementTimers() {
 	if ch.ST > 0 {
 		ch.ST--
 		if ch.ST == 0 {
-			fmt.Println("=====BEEEEP=====")
+			// TODO: add audio output
+			log.Println("=====BEEEEP=====")
 		}
 	}
 	if ch.DT > 0 {

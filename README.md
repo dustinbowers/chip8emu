@@ -1,8 +1,8 @@
 # Chip8 Emulator
 
-A super basic emulation of CHIP8. Nothin' fancy here
+A super basic emulation of [CHIP8](https://en.wikipedia.org/wiki/CHIP-8). Nothin' fancy here
 
-![](screens/pong.png)
+![](screens/space-invaders.png)
 
 `roms/` grabbed from https://github.com/jamesmcm/chip8go/tree/master/roms
 
@@ -14,7 +14,10 @@ brew install sdl2{,_image,_mixer,_ttf,_gfx} pkg-config
 ```
 
 - Build: `make`
+    - `./build/chip8-darwin [rom path]`
 - Run: `make run`
+
+<sub>(Or live dangerously and run the pre-compiled darwin binary in `build/`)</sub>
 
 ## Input
 16 keys, 0 to F (8, 4, 6, 2 are sometimes used for direction input)
@@ -77,7 +80,7 @@ See: https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
 ```
 
 ### Stack
-Typically the stack is 48 bytes (12 levels at 4 address bits each). This implementation supports 16 levels
+Typically the stack is 48 bytes (12 levels * 4 address bits each). This implementation supports 16 levels
 
 ### Timers (60hz)
 
@@ -86,12 +89,12 @@ Typically the stack is 48 bytes (12 levels at 4 address bits each). This impleme
     
 ## TODO
 
-- [ ] File-path flag
+- [x] File-path argument
 - [ ] RESET key
-- [ ] Tests
-- [ ] Debug outputs
 - [ ] Double buffering to prevent flickering
+- [ ] Debug outputs
 - [ ] Audio beep
+- [ ] Tests
 - [ ] SUPER CHIP8 opcodes
 - [ ] Hires mode
 
@@ -99,3 +102,11 @@ Typically the stack is 48 bytes (12 levels at 4 address bits each). This impleme
 
 - https://en.wikipedia.org/wiki/CHIP-8
 - http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
+<br /><br />
+- Special thanks to https://github.com/jamesmcm/chip8go/ for `roms/` collection
+
+## Other screens
+
+![](screens/pong.png)
+<br /><br />
+![](screens/ibm-logo.png)
