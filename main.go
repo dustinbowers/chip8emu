@@ -26,8 +26,8 @@ func main() {
 	//err := emu.LoadRom("roms/games/Space Flight.ch8")
 	//err := emu.LoadRom("roms/games/Cave.ch8")
 	//err := emu.LoadRom("roms/games/Pong (1 player).ch8")
-	//err := emu.LoadRom("roms/games/Space Invaders [David Winter].ch8")
-	err := emu.LoadRom("roms/games/Tetris [Fran Dachille, 1991].ch8")
+	err := emu.LoadRom("roms/games/Space Invaders [David Winter].ch8")
+	//err := emu.LoadRom("roms/games/Tetris [Fran Dachille, 1991].ch8")
 	//err := emu.LoadRom("roms/games/Worm V4 [RB-Revival Studios, 2007].ch8")
 	if err != nil {
 		os.Exit(1)
@@ -60,7 +60,7 @@ func main() {
 
 	running := true
 
-	hz := 300
+	hz := 700
 	delay := time.Duration(1000 / hz)
 	go func() {
 		log.Println("Starting... ")
