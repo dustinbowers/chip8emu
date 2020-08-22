@@ -61,7 +61,7 @@ type Chip8 struct {
 	PC       uint16        // Program/Instruction counter
 	I        uint16        // Index register
 	SP       uint16        // Stack pointer
-	Stack    [16]uint16	   // :pancakes:
+	Stack    [16]uint16    // :pancakes:
 	DT       uint8         // Delay timer
 	ST       uint8         // Sound timer
 	DrawFlag bool          // Redraw when true
@@ -135,7 +135,7 @@ func (ch *Chip8) fetchOpcode() {
 	ch.n = pc1Byte & 0x0F        // lower 4 bits of low byte
 	ch.x = pcByte & 0x0F         // lower 4 bits of high byte
 	ch.y = (pc1Byte >> 4) & 0x0F // upper 4 bits of low byte
-	ch.kk = pc1Byte				 // low byte
+	ch.kk = pc1Byte              // low byte
 	ch.nnn = ch.opcode & 0x0FFF  // lower 12 bits of opcode (for addresses into 2^12 bytes of memory)
 
 	ch.PC += 2 // Advance the program counter after we have the internals set for processing

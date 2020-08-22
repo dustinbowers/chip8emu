@@ -53,6 +53,9 @@ func Draw(cells [64][32]uint8) {
 			xPos := int32(x) * blockWidth
 			yPos := int32(y) * blockHeight
 
+			// Yes, it is inefficient to re-draw the entire screen when not needed.
+			// It's done to ensure that each frame's blitting ops take approximately
+			// the same amount of time to complete regardless of 'on' pixels
 			var color uint32 = 0x00000000
 			if cell == 1 {
 				color = 0xffffffff
