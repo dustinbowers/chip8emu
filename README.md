@@ -8,6 +8,11 @@ A super basic implementation of CHIP8. Nothin' fancy here
 
 ## Usage
 
+Install some stuff if you don't have SDL packages yet 
+```
+brew install sdl2{,_image,_mixer,_ttf,_gfx} pkg-config
+```
+
 - Build: `make`
 - Run: `make run`
 
