@@ -26,37 +26,72 @@ var fontSet = [80]byte{
 	0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 }
 
-type Chip8 struct {
-	Screen [64][32]uint8
-	Memory [4096]byte
-	V      [16]byte
-	PC     uint16
-	I      uint16
-	SP     uint16
-	Stack  [16]uint16
-	DT     uint8
-	ST     uint8
-	DrawFlag bool
+/*
+Memory Map:
++---------------+= 0xFFF (4095) End of Chip-8 RAM
+|               |
+|               |
+|               |
+|               |
+|               |
+| 0x200 to 0xFFF|
+|     Chip-8    |
+| Program / Data|
+|     Space     |
+|               |
+|               |
+|               |
++- - - - - - - -+= 0x600 (1536) Start of ETI 660 Chip-8 programs
+|               |
+|               |
+|               |
++---------------+= 0x200 (512) Start of most Chip-8 programs
+| 0x000 to 0x1FF|
+| Reserved for  |
+|  interpreter  |
++---------------+= 0x000 (0) Start of Chip-8 RAM
 
-	// internals
-	lastKey     *uint8
-	keyboard    [16]bool
-	opcode      uint16
-	x, y, n, kk uint8
-	nnn         uint16
+*/
+
+type Chip8 struct {
+	Screen   [64][32]uint8 // flags for pixel on or off
+	Memory   [4096]byte    // Program entry point is typically 0x200
+	V        [16]byte      // 16 8-bit registers (note VF is a carry-flag register)
+	PC       uint16        // Program/Instruction counter
+	I        uint16        // Index register
+	SP       uint16        // Stack pointer
+	Stack    [16]uint16
+	DT       uint8 // Delay timer
+	ST       uint8 // Sound timer
+	DrawFlag bool  // Causes a redraw when set
+
+	/*
+		Input: 16 keys, 0 to F (8, 4, 6, 2 are used for direction input)
+		1	2	3	C
+		4	5	6	D
+		7	8	9	E
+		A	0	B	F
+	*/
+	keyboard [16]bool // Keys range from 0-F in a 4x4 grid
+
+	// internals for easier opcode processing
+	lastKey     *uint8 // Used for interrupting an input block (see Fx0A - LD Vx, K below)
+	opcode      uint16 // Stores the current opcode. All opcodes are 2 bytes
+	x, y, n, kk uint8  // various parts of the current opcode, used for easier processing
+	nnn         uint16 // Stores addresses from opcodes
 }
 
 func (ch *Chip8) Initialize() {
-	// Load fontset into memory
+	// Load fontset into memory (16 8x5 sprites)
 	for i, b := range fontSet {
 		ch.Memory[i+0x050] = b
 	}
 
-	// Entrypoint
+	// Set Entrypoint
 	ch.PC = 0x200
 
+	// Start subroutine for Delay timer and Sound Timer
 	ch.startClock()
-
 }
 
 func (ch *Chip8) LoadRom(filepath string) error {
@@ -71,18 +106,7 @@ func (ch *Chip8) LoadRom(filepath string) error {
 	return nil
 }
 
-func (ch *Chip8) randScreen() { // for demo purposes
-	for x, _ := range ch.Screen {
-		for y, _ := range ch.Screen[x] {
-			on := uint8(rand.Intn(2))
-			ch.Screen[x][y] = on
-		}
-	}
-}
-
 func (ch *Chip8) EmulateCycle() (bool, error) {
-
-	// Fetch opcode
 	ch.fetchOpcode()
 
 	// Decode & Execute opcode
@@ -99,21 +123,25 @@ func (ch *Chip8) fetchOpcode() {
 	pc1Byte := ch.Memory[ch.PC+1]
 
 	// Each opcode is 2 bytes
+	ch.opcode = (uint16(pcByte) << 8) | uint16(pc1Byte)
+
+	// These internal values are always calculated, but not always used
 	// 0000 0000 0000 0000
 	//      x--- y--- n---
 	//      nnn-----------
 	//           kk-------
-	ch.opcode = (uint16(pcByte) << 8) | uint16(pc1Byte)
 	ch.n = pc1Byte & 0x0F        // lower 4 bits of low byte
 	ch.x = pcByte & 0x0F         // lower 4 bits of high byte
 	ch.y = (pc1Byte >> 4) & 0x0F // upper 4 bits of low byte
 	ch.kk = pc1Byte
 	ch.nnn = ch.opcode & 0x0FFF
 
-	ch.PC += 2
+	ch.PC += 2 // Advance the program counter after we have the internals set for processing
 }
 
 func (ch *Chip8) executeOpcode() error {
+
+	// Opcode table reference: https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
 
 	switch ch.opcode & 0xF000 {
 	case 0x0000:
@@ -214,24 +242,24 @@ func (ch *Chip8) executeOpcode() error {
 	case 0xD000: // Dxyn - DRW Vx, Vy, nibble
 		col := ch.V[ch.x]
 		row := ch.V[ch.y]
-		ch.V[0xF] = 0
+		ch.V[0xF] = 0 // reset carry flag
 		for byteInd := 0; byteInd < int(ch.n); byteInd++ {
-			spriteByte := ch.Memory[int(ch.I) + byteInd]
+			spriteByte := ch.Memory[int(ch.I)+byteInd]
 			for bitInd := 0; bitInd < 8; bitInd++ {
 				bit := (spriteByte >> bitInd) & 0x1
 
-				screenX := (col + byte(7 - bitInd)) % 64
+				screenX := (col + byte(7-bitInd)) % 64
 				screenY := (row + byte(byteInd)) % 32
 
 				currVal := ch.Screen[screenX][screenY]
 				if bit == 1 && currVal == 1 {
-					ch.V[0xF] = 1
+					ch.V[0xF] = 1 // set carry flag if a collision occurs
 				}
 
-				ch.Screen[screenX][screenY] ^= bit // currVal != bool(bit)
+				ch.Screen[screenX][screenY] ^= bit // toggle pixels
 			}
 		}
-		ch.DrawFlag = true
+		ch.DrawFlag = true // need a redraw
 
 	case 0xE000: // User inputs
 		switch ch.kk {
@@ -251,15 +279,14 @@ func (ch *Chip8) executeOpcode() error {
 		case 0x07: // Fx07 - LD Vx, DT
 			ch.V[ch.x] = ch.DT
 		case 0x0A: // Fx0A - LD Vx, K
-			fmt.Print("waiting for keypress ")
+			fmt.Print("Waiting for keypress ")
 			for {
 				if ch.lastKey == nil {
-					//fmt.Print(".")
 					time.Sleep(time.Microsecond * 1600) // ~700 Hz
 					continue
 				}
 				ch.V[ch.x] = *ch.lastKey
-				fmt.Println("GOT A KEYPRESS! ", ch.V[ch.x])
+				fmt.Println("Got a keypress", ch.V[ch.x])
 				ch.lastKey = nil
 			}
 		case 0x15: // Fx15 - LD DT, Vx
@@ -276,19 +303,19 @@ func (ch *Chip8) executeOpcode() error {
 			//	ch.V[0xF] = 0
 			//}
 		case 0x29: // Fx29 - LD F, Vx
-			ch.I = uint16(ch.V[ch.x]) * 5 + 0x050
+			ch.I = uint16(ch.V[ch.x])*5 + 0x050
 		case 0x33: // Fx33 - LD B, Vx
-			ch.Memory[ch.I] = uint8((uint16(ch.V[ch.x]) % 1000) / 100)
-			ch.Memory[ch.I+1] = (ch.V[ch.x] % 100) / 10
-			ch.Memory[ch.I+2] = ch.V[ch.x] % 10
+			ch.Memory[ch.I] = uint8((uint16(ch.V[ch.x]) % 1000) / 100) // Hundreds place
+			ch.Memory[ch.I+1] = (ch.V[ch.x] % 100) / 10                // Tens place
+			ch.Memory[ch.I+2] = ch.V[ch.x] % 10                        // Ones place
 		case 0x55: // Fx55 - LD [I], Vx
 			for a := 0; a <= int(ch.x); a++ {
-				ch.Memory[ch.I + uint16(a)] = ch.V[a]
+				ch.Memory[ch.I+uint16(a)] = ch.V[a]
 			}
 			ch.I += uint16(ch.x) + 1
 		case 0x65: // Fx65 - LD Vx, [I]
 			for a := 0; a <= int(ch.x); a++ {
-				ch.V[a] = ch.Memory[ch.I + uint16(a)]
+				ch.V[a] = ch.Memory[ch.I+uint16(a)]
 			}
 			ch.I += uint16(ch.x) + 1
 		default:
@@ -298,15 +325,13 @@ func (ch *Chip8) executeOpcode() error {
 	return nil
 }
 
-func (ch* Chip8) KeyDown(key uint8) {
+func (ch *Chip8) KeyDown(key uint8) {
 	ch.lastKey = &key
 	ch.keyboard[key] = true
-	//fmt.Printf("\\/ Keyboard: %+v\n", ch.keyboard)
 }
 
-func (ch* Chip8) KeyUp(key uint8) {
+func (ch *Chip8) KeyUp(key uint8) {
 	ch.keyboard[key] = false
-	//fmt.Printf("/\\ Keyboard: %+v\n", ch.keyboard)
 }
 
 func (ch *Chip8) startClock() {
@@ -329,9 +354,3 @@ func (ch *Chip8) decrementTimers() {
 		ch.DT--
 	}
 }
-
-func (ch *Chip8) unknownOpcode() {
-
-}
-
-

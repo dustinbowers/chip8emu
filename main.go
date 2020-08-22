@@ -17,25 +17,18 @@ const (
 var keyMap map[int]uint8
 
 func main() {
-	ui.Init(512, 256, screenCols, screenRows)
-	defer ui.Cleanup()
-
 	var emu chip8.Chip8
 	emu.Initialize()
 	//err := emu.LoadRom("roms/demos/Maze [David Winter, 199x].ch8")
-	//err := emu.LoadRom("roms/demos/Stars [Sergey Naydenov, 2010].ch8")
 	//err := emu.LoadRom("roms/demos/Zero Demo [zeroZshadow, 2007].ch8")
 	//err := emu.LoadRom("roms/games/Brix [Andreas Gustafsson, 1990].ch8")
 	//err := emu.LoadRom("roms/games/Addition Problems [Paul C. Moews].ch8")
 	//err := emu.LoadRom("roms/games/Space Flight.ch8")
 	//err := emu.LoadRom("roms/games/Cave.ch8")
 	//err := emu.LoadRom("roms/games/Pong (1 player).ch8")
-	err := emu.LoadRom("roms/games/Space Invaders [David Winter].ch8")
-	//err := emu.LoadRom("roms/games/Tetris [Fran Dachille, 1991].ch8")
+	//err := emu.LoadRom("roms/games/Space Invaders [David Winter].ch8")
+	err := emu.LoadRom("roms/games/Tetris [Fran Dachille, 1991].ch8")
 	//err := emu.LoadRom("roms/games/Worm V4 [RB-Revival Studios, 2007].ch8")
-	//err := emu.LoadRom("roms/programs/Random Number Test [Matthew Mikolay, 2010].ch8")
-	//err := emu.LoadRom("roms/programs/Keypad Test [Hap, 2006].ch8")
-	//err := emu.LoadRom("roms/programs/Clock Program [Bill Fisher, 1981].ch8")
 	if err != nil {
 		os.Exit(1)
 		return
@@ -62,9 +55,13 @@ func main() {
 	keyMap[sdl.K_c] = 0xb
 	keyMap[sdl.K_v] = 0xf
 
+	ui.Init(512, 256, screenCols, screenRows)
+	defer ui.Cleanup()
 
 	running := true
 
+	hz := 300
+	delay := time.Duration(1000 / hz)
 	go func() {
 		log.Println("Starting... ")
 		for {
@@ -75,12 +72,12 @@ func main() {
 			if running == false {
 				return
 			}
-			time.Sleep(time.Microsecond * 1600) // ~700 Hz
+			time.Sleep(time.Microsecond * delay * 1000) // ~700 Hz
 		}
 	}()
 
 	for running {
-		if(emu.DrawFlag) {
+		if emu.DrawFlag {
 			ui.Draw(emu.Screen)
 			emu.DrawFlag = false
 		}

@@ -5,11 +5,11 @@ import (
 )
 
 var (
-	width int32
-	height int32
-	rows int32
-	cols int32
-	blockWidth int32
+	width       int32
+	height      int32
+	rows        int32
+	cols        int32
+	blockWidth  int32
 	blockHeight int32
 )
 
