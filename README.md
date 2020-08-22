@@ -4,6 +4,8 @@ A super basic implementation of CHIP8. Nothin' fancy here
 
 ![](screens/pong.png)
 
+`roms/` grabbed from https://github.com/jamesmcm/chip8go/tree/master/roms
+
 ## Usage
 
 - Build: `make`
