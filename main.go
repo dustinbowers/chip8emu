@@ -32,6 +32,7 @@ func main() {
 	log.Printf("Loading rom at: %v\n", romPath)
 	err := emu.LoadRom(romPath)
 	if err != nil {
+		log.Printf("Rom load failed: %v", err)
 		os.Exit(1)
 		return
 	}

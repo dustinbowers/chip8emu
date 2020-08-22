@@ -133,8 +133,8 @@ func (ch *Chip8) fetchOpcode() {
 	ch.n = pc1Byte & 0x0F        // lower 4 bits of low byte
 	ch.x = pcByte & 0x0F         // lower 4 bits of high byte
 	ch.y = (pc1Byte >> 4) & 0x0F // upper 4 bits of low byte
-	ch.kk = pc1Byte
-	ch.nnn = ch.opcode & 0x0FFF
+	ch.kk = pc1Byte				 // low byte
+	ch.nnn = ch.opcode & 0x0FFF  // lower 12 bits of opcode (for addresses into 2^12 bytes of memory)
 
 	ch.PC += 2 // Advance the program counter after we have the internals set for processing
 }
@@ -201,6 +201,7 @@ func (ch *Chip8) executeOpcode() error {
 			}
 			ch.V[ch.x] = ch.V[ch.x] - ch.V[ch.y]
 		case 0x6: // 8xy6 - SHR Vx {, Vy}
+			// TODO: 'VF = Vx & 0x1'
 			if ch.V[ch.x]&0x1 == 1 {
 				ch.V[0xF] = 1
 			} else {
@@ -215,6 +216,7 @@ func (ch *Chip8) executeOpcode() error {
 			}
 			ch.V[ch.x] = ch.V[ch.y] - ch.V[ch.x]
 		case 0xE: // 8xyE - SHL Vx {, Vy}
+			// TODO: 'VF = (Vx >> 7) & 0x1'
 			if (ch.V[ch.x]>>7)&0x1 == 1 {
 				ch.V[0xF] = 1
 			} else {
@@ -279,6 +281,7 @@ func (ch *Chip8) executeOpcode() error {
 		case 0x07: // Fx07 - LD Vx, DT
 			ch.V[ch.x] = ch.DT
 		case 0x0A: // Fx0A - LD Vx, K
+			// TODO: remove debug output and write proper tests
 			fmt.Print("Waiting for keypress ")
 			for {
 				if ch.lastKey == nil {
@@ -288,6 +291,7 @@ func (ch *Chip8) executeOpcode() error {
 				ch.V[ch.x] = *ch.lastKey
 				fmt.Println("Got a keypress", ch.V[ch.x])
 				ch.lastKey = nil
+				break
 			}
 		case 0x15: // Fx15 - LD DT, Vx
 			ch.DT = ch.V[ch.x]
