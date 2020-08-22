@@ -6,7 +6,8 @@ A super basic implementation of CHIP8. Nothin' fancy here
 
 ## Usage
 
-`make run`
+- Build: `make`
+- Run: `make run`
 
 ## Input
 16 keys, 0 to F (8, 4, 6, 2 are used for direction input)
