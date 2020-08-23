@@ -2,8 +2,6 @@
 
 A super basic emulation of [CHIP8](https://en.wikipedia.org/wiki/CHIP-8). Nothin' fancy here
 
-See [Chip8.pdf](docs/Chip8.pdf) for design specifications
-
 ![](screens/space-invaders.png)
 
 `roms/` grabbed from https://github.com/jamesmcm/chip8go/tree/master/roms
@@ -111,6 +109,7 @@ Typically the stack is 48 bytes (12 levels * 4 address bits each). This implemen
 
 - https://en.wikipedia.org/wiki/CHIP-8
 - http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
+- [Chip8.pdf](docs/Chip8.pdf)
 <br /><br />
 - Special thanks to https://github.com/jamesmcm/chip8go/ for `roms/` collection
 
