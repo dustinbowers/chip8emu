@@ -2,6 +2,8 @@
 
 A super basic emulation of [CHIP8](https://en.wikipedia.org/wiki/CHIP-8). Nothin' fancy here
 
+See [Chip8.pdf](docs/Chip8.pdf) for design specifications
+
 ![](screens/space-invaders.png)
 
 `roms/` grabbed from https://github.com/jamesmcm/chip8go/tree/master/roms
