@@ -19,9 +19,9 @@ var keyMap map[int]uint8
 func main() {
 	var romPath string
 	romPath = "roms/games/Space Invaders [David Winter].ch8"
-	romPath = "roms/programs/Keypad Test [Hap, 2006].ch8"
-	romPath = "roms/programs/Clock Program [Bill Fisher, 1981].ch8"
-	romPath = "roms/programs/BC_test.ch8"
+	//romPath = "roms/programs/Keypad Test [Hap, 2006].ch8"
+	//romPath = "roms/programs/Clock Program [Bill Fisher, 1981].ch8"
+	//romPath = "roms/programs/BC_test.ch8"
 	if len(os.Args) == 2 {
 		romPath = os.Args[1]
 	}
@@ -44,6 +44,7 @@ func main() {
 
 	ui.Init(512, 256, screenCols, screenRows)
 	defer ui.Cleanup()
+	emu.SetBeepHandler(ui.Beep)
 
 	running := true
 	paused := false

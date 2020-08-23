@@ -74,6 +74,8 @@ type Chip8 struct {
 	ST       uint8         // Sound timer
 	DrawFlag bool          // Redraw when true
 
+	beepCallback func()
+
 	/*
 		Input: 16 keys, 0 to F (8, 4, 6, 2 are used for direction input)
 		1	2	3	C
@@ -118,6 +120,10 @@ func (ch *Chip8) Initialize() {
 
 	// Start subroutine for Delay timer and Sound Timer
 	ch.startClock()
+}
+
+func (ch *Chip8) SetBeepHandler(callback func()) {
+	ch.beepCallback = callback
 }
 
 func (ch* Chip8) Pause() {
@@ -401,9 +407,8 @@ func (ch *Chip8) startClock() {
 func (ch *Chip8) decrementTimers() {
 	if ch.ST > 0 {
 		ch.ST--
-		if ch.ST == 0 {
-			// TODO: add audio output
-			log.Println("=====BEEEEP=====")
+		if ch.ST == 0 && ch.beepCallback != nil {
+			ch.beepCallback()
 		}
 	}
 	if ch.DT > 0 {

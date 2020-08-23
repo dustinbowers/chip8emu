@@ -97,11 +97,11 @@ Typically the stack is 48 bytes (12 levels * 4 address bits each). This implemen
 ## TODO
 
 - [x] File-path argument
+- [x] Audio beep
+- [x] Debug outputs
 - [ ] RESET key
-- [ ] (maybe?) Double buffering to prevent flickering
-- [ ] Debug outputs
-- [ ] Audio beep
 - [ ] Tests
+- [ ] (maybe?) Double buffering to prevent flickering
 - [ ] SUPER CHIP8 opcodes
 - [ ] Hires mode
 
