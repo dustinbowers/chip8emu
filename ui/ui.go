@@ -9,7 +9,6 @@ import (
 	"log"
 	"math"
 	"reflect"
-	"time"
 	"unsafe"
 )
 
@@ -111,12 +110,13 @@ func Draw(cells [64][32]uint8) error {
 	return nil
 }
 
-func Beep() {
-	go func() {
-		sdl.PauseAudioDevice(audioDev, false)
-		time.Sleep(time.Millisecond * 50)
-		sdl.PauseAudioDevice(audioDev, true)
-	}()
+func Beep(on bool) {
+	sdl.PauseAudioDevice(audioDev, !on)
+	//go func() {
+	//	sdl.PauseAudioDevice(audioDev, false)
+	//	time.Sleep(time.Millisecond * 50)
+	//	sdl.PauseAudioDevice(audioDev, true)
+	//}()
 }
 
 //export SineWave

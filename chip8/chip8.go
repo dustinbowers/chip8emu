@@ -74,7 +74,7 @@ type Chip8 struct {
 	ST       uint8         // Sound timer
 	DrawFlag bool          // Redraw when true
 
-	beepCallback func()
+	beepCallback func(bool)
 
 	/*
 		Input: 16 keys, 0 to F (8, 4, 6, 2 are used for direction input)
@@ -122,7 +122,7 @@ func (ch *Chip8) Initialize() {
 	ch.startClock()
 }
 
-func (ch *Chip8) SetBeepHandler(callback func()) {
+func (ch *Chip8) SetBeepHandler(callback func(bool)) {
 	ch.beepCallback = callback
 }
 
@@ -247,12 +247,6 @@ func (ch *Chip8) executeOpcode() error {
 			}
 			ch.V[ch.x] = ch.V[ch.x] - ch.V[ch.y]
 		case 0x6: // 8xy6 - SHR Vx {, Vy}
-			// TODO: 'VF = Vx & 0x1'
-			/*if ch.V[ch.x]&0x1 == 1 {
-				ch.V[0xF] = 1
-			} else {
-				ch.V[0xF] = 0
-			}*/
 			ch.V[0xF] = ch.V[ch.x] & 0x1
 			ch.V[ch.x] = ch.V[ch.x] >> 1
 		case 0x7: // 8xy7 - SUBN Vx, Vy
@@ -263,12 +257,6 @@ func (ch *Chip8) executeOpcode() error {
 			}
 			ch.V[ch.x] = ch.V[ch.y] - ch.V[ch.x]
 		case 0xE: // 8xyE - SHL Vx {, Vy}
-			// TODO: 'VF = (Vx >> 7) & 0x1'
-			//if (ch.V[ch.x]>>7)&0x1 == 1 {
-			//	ch.V[0xF] = 1
-			//} else {
-			//	ch.V[0xF] = 0
-			//}
 			ch.V[0xF] = (ch.V[ch.x] >> 7) & 0x1
 			ch.V[ch.x] = ch.V[ch.x] << 1
 		default:
@@ -345,6 +333,9 @@ func (ch *Chip8) executeOpcode() error {
 			ch.DT = ch.V[ch.x]
 		case 0x18: // Fx18 - LD ST, Vx
 			ch.ST = ch.V[ch.x]
+			if ch.ST > 0 {
+				ch.beepCallback(true)
+			}
 		case 0x1E: // Fx1E - ADD I, Vx
 			ch.I += uint16(ch.V[ch.x])
 
@@ -408,7 +399,7 @@ func (ch *Chip8) decrementTimers() {
 	if ch.ST > 0 {
 		ch.ST--
 		if ch.ST == 0 && ch.beepCallback != nil {
-			ch.beepCallback()
+			ch.beepCallback(false)
 		}
 	}
 	if ch.DT > 0 {
