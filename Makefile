@@ -9,7 +9,7 @@ test:
 	go test -race -p 1 -timeout 2m -v ./...
 
 VERSION=$(shell date +%Y%m%d-%H%M%S)-$(shell git rev-parse --verify --short HEAD)
-GO_BUILD_FLAGS=#-ldflags "-X github.com/PilotFiber/radar/lib/go/version.Version=${VERSION}"
+GO_BUILD_FLAGS=
 APP_NAME=chip8
 BUILD_PATH=./build
 
