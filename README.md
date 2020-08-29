@@ -2,7 +2,7 @@
 
 A super basic emulation of [CHIP8](https://en.wikipedia.org/wiki/CHIP-8). Nothin' fancy here
 
-![](screens/space-invaders.png){:width="50%"}
+<img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/space-invaders.png" width="50%">
 
 `roms/` grabbed from https://github.com/jamesmcm/chip8go/tree/master/roms
 
@@ -114,6 +114,6 @@ Typically the stack is 48 bytes (12 levels * 4 address bits each). This implemen
 
 ## Other screens
 
-![](screens/pong.png){:width="50%"}
-<br /><br />
-![](screens/ibm-logo.png){:width="50%"}
+<img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/pong.png" width="50%">
+<br />
+<img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/ibm-logo.png" width="50%">
