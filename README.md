@@ -4,7 +4,7 @@ A super basic emulation of [CHIP8](https://en.wikipedia.org/wiki/CHIP-8). Nothin
 
 <img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/space-invaders.png" width="50%">
 
-`roms/` grabbed from https://github.com/jamesmcm/chip8go/tree/master/roms
+`roms/` may or may not be available here https://github.com/jamesmcm/chip8go/tree/master/roms
 
 ## Usage
 
