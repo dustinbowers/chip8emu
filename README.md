@@ -21,11 +21,11 @@ brew install sdl2{,_image,_mixer,_ttf,_gfx} pkg-config
 
 ## Input
 
-- **P** - Pause emulator processing
-
-- **O** - Resume emulator processing
-
-- **I** - Inspect state of emulator (see console)
+| Key | Description                             |
+|-----|-----------------------------------------|
+|  p  | Pause emulator processing               |
+|  o  | Resume emulator processing              |
+|  i  | Inspect state of emulator (see console) |
 
 **Gamepad input:** 16 keys, 0 to F (8, 4, 6, 2 are sometimes used for direction input)
 
