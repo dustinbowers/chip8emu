@@ -115,5 +115,5 @@ Typically the stack is 48 bytes (12 levels * 4 address bits each). This implemen
 ## Other screens
 
 <img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/pong.png" width="50%">
-<br />
+
 <img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/ibm-logo.png" width="50%">
