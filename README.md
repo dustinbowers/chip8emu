@@ -96,6 +96,8 @@ Typically the stack is 48 bytes (12 levels * 4 address bits each). This implemen
     
 ## TODO
 
+_Note: I'm no longer actively working on this project_
+
 - [x] File-path argument
 - [x] Audio beep
 - [x] Debug outputs
