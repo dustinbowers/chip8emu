@@ -112,11 +112,6 @@ func Draw(cells [64][32]uint8) error {
 
 func Beep(on bool) {
 	sdl.PauseAudioDevice(audioDev, !on)
-	//go func() {
-	//	sdl.PauseAudioDevice(audioDev, false)
-	//	time.Sleep(time.Millisecond * 50)
-	//	sdl.PauseAudioDevice(audioDev, true)
-	//}()
 }
 
 //export SineWave

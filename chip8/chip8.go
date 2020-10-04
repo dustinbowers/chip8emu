@@ -126,7 +126,7 @@ func (ch *Chip8) SetBeepHandler(callback func(bool)) {
 	ch.beepCallback = callback
 }
 
-func (ch* Chip8) Pause() {
+func (ch *Chip8) Pause() {
 	if ch.wg != nil {
 		return
 	}
@@ -134,7 +134,7 @@ func (ch* Chip8) Pause() {
 	ch.wg.Add(1)
 }
 
-func (ch* Chip8) Resume() {
+func (ch *Chip8) Resume() {
 	ch.wg.Done()
 	ch.wg = nil
 }
