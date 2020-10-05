@@ -2,9 +2,9 @@
 
 A super basic emulation of [CHIP8](https://en.wikipedia.org/wiki/CHIP-8). Nothin' fancy here
 
-![](screens/space-invaders.png)
+<img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/space-invaders.png" width="50%">
 
-`roms/` grabbed from https://github.com/jamesmcm/chip8go/tree/master/roms
+`roms/` may or may not be available here https://github.com/jamesmcm/chip8go/tree/master/roms
 
 ## Usage
 
@@ -21,11 +21,11 @@ brew install sdl2{,_image,_mixer,_ttf,_gfx} pkg-config
 
 ## Input
 
-**P** - Pause emulator processing
-
-**O** - Resume emulator processing
-
-**I** - Inspect state of emulator (see console)
+| Key | Description                             |
+|-----|-----------------------------------------|
+|  p  | Pause emulator processing               |
+|  o  | Resume emulator processing              |
+|  i  | Inspect state of emulator (see console) |
 
 **Gamepad input:** 16 keys, 0 to F (8, 4, 6, 2 are sometimes used for direction input)
 
@@ -96,6 +96,8 @@ Typically the stack is 48 bytes (12 levels * 4 address bits each). This implemen
     
 ## TODO
 
+_Note: I'm no longer actively working on this project_
+
 - [x] File-path argument
 - [x] Audio beep
 - [x] Debug outputs
@@ -114,6 +116,6 @@ Typically the stack is 48 bytes (12 levels * 4 address bits each). This implemen
 
 ## Other screens
 
-![](screens/pong.png)
-<br /><br />
-![](screens/ibm-logo.png)
+<img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/pong.png" width="50%">
+
+<img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/ibm-logo.png" width="50%">
