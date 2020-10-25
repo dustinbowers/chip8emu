@@ -1,8 +1,8 @@
 package main
 
 import (
-	"chip8emu/chip8"
-	"chip8emu/ui"
+	"github.com/dustinbowers/chip8emu/chip8"
+	"github.com/dustinbowers/chip8emu/ui"
 	"github.com/veandco/go-sdl2/sdl"
 	"log"
 	"os"
