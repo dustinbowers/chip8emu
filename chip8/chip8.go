@@ -145,10 +145,15 @@ func (ch *Chip8) LoadRom(filepath string) error {
 		return fmt.Errorf("loadRom: failed reading file: %v", err)
 	}
 
-	for i, b := range data {
+	ch.LoadRomBytes(data)
+
+	return nil
+}
+
+func (ch* Chip8) LoadRomBytes(bytes []byte) {
+	for i, b := range bytes {
 		ch.Memory[i+0x200] = b
 	}
-	return nil
 }
 
 func (ch *Chip8) EmulateCycle() (bool, error) {
