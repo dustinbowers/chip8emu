@@ -26,10 +26,8 @@ func main() {
 		romPath = os.Args[1]
 	}
 
-	var emu chip8.Chip8
-
 	log.Print("Initializing emulator... ")
-	emu.Initialize()
+	emu := chip8.NewChip8()
 	log.Println("Done")
 
 	log.Printf("Loading rom at: %v\n", romPath)

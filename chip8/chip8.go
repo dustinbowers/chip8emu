@@ -106,7 +106,9 @@ func (ch *Chip8) Inspect() (state string) {
 	return state
 }
 
-func (ch *Chip8) Initialize() {
+func NewChip8() *Chip8 {
+	var ch Chip8
+
 	// Load fontset into memory (16 8bit*5 row sprites)
 	// Note: Spec says font sprites start at 0x050. Some emus start at 0x0
 	for i, b := range fontSet {
@@ -118,8 +120,36 @@ func (ch *Chip8) Initialize() {
 	// Set Entrypoint
 	ch.PC = 0x200
 
-	// Start subroutine for Delay timer and Sound Timer
 	ch.startClock()
+
+	return &ch
+}
+
+func (ch *Chip8) Reset() {
+	for i, c := range ch.Screen {
+		for j, _ := range c {
+			ch.Screen[i][j] = 0
+		}
+	}
+	for i, _ := range ch.Memory{
+		ch.Memory[i] = 0
+	}
+	for i, _ := range ch.V {
+		ch.V[i] = 0
+	}
+	ch.PC = 0x200
+	ch.I = 0
+	ch.SP = 0
+	for i, _ := range ch.Stack {
+		ch.Stack[i] = 0
+	}
+	ch.DT = 0
+	ch.ST = 0
+	ch.DrawFlag = false
+	for i, _ := range ch.keyboard {
+		ch.keyboard[i] = false
+	}
+
 }
 
 func (ch *Chip8) SetBeepHandler(callback func(bool)) {
@@ -153,6 +183,7 @@ func (ch *Chip8) LoadRom(filepath string) error {
 }
 
 func (ch* Chip8) LoadRomBytes(bytes []byte) {
+	ch.Reset()
 	for i, b := range bytes {
 		ch.Memory[i+0x200] = b
 	}
