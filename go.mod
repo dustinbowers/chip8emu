@@ -1,4 +1,4 @@
-module github.com/dustinbowers/chip8emu/
+module chip8emu
 
 go 1.14
 
