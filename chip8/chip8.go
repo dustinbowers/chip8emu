@@ -135,8 +135,10 @@ func (ch *Chip8) Pause() {
 }
 
 func (ch *Chip8) Resume() {
-	ch.wg.Done()
-	ch.wg = nil
+	if ch.wg != nil {
+		ch.wg.Done()
+		ch.wg = nil
+	}
 }
 
 func (ch *Chip8) LoadRom(filepath string) error {
