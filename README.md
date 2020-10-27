@@ -1,6 +1,8 @@
 # Chip8 Emulator
 
-A super basic emulation of [CHIP8](https://en.wikipedia.org/wiki/CHIP-8). Nothin' fancy here
+A super basic emulation of [CHIP8](https://en.wikipedia.org/wiki/CHIP-8). Nothin' fancy here. 
+
+Follow my work on wrapping this with WebAssembly to run in a browser here: [chip8emu-wasm](https://github.com/dustinbowers/chip8emu-wasm)
 
 <img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/space-invaders.png" width="50%">
 
