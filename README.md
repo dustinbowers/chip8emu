@@ -8,6 +8,10 @@ Follow my work on wrapping this with WebAssembly to run in a browser here: [chip
 
 `roms/` may or may not be available here https://github.com/jamesmcm/chip8go/tree/master/roms
 
+## Live Demo
+
+For a WebAssembly / WebGL wrapped live demo see: https://dustinbowers.com/chip8
+
 ## Usage
 
 Install some stuff if you don't have SDL packages yet 
