@@ -1,10 +1,16 @@
 # Chip8 Emulator
 
-A super basic emulation of [CHIP8](https://en.wikipedia.org/wiki/CHIP-8). Nothin' fancy here
+A super basic emulation of [CHIP8](https://en.wikipedia.org/wiki/CHIP-8). Nothin' fancy here. 
+
+Follow my work on wrapping this with WebAssembly to run in a browser here: [chip8emu-wasm](https://github.com/dustinbowers/chip8emu-wasm)
 
 <img src="https://github.com/dustinbowers/chip8emu/blob/master/screens/space-invaders.png" width="50%">
 
 `roms/` may or may not be available here https://github.com/jamesmcm/chip8go/tree/master/roms
+
+## Live Demo
+
+For a WebAssembly / WebGL wrapped live demo see: https://dustinbowers.com/chip8
 
 ## Usage
 
@@ -96,16 +102,11 @@ Typically the stack is 48 bytes (12 levels * 4 address bits each). This implemen
     
 ## TODO
 
-_Note: I'm no longer actively working on this project_
-
 - [x] File-path argument
 - [x] Audio beep
 - [x] Debug outputs
 - [ ] RESET key
-- [ ] Tests
-- [ ] (maybe?) Double buffering to prevent flickering
-- [ ] SUPER CHIP8 opcodes
-- [ ] Hires mode
+
 
 ## References
 
