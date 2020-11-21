@@ -92,6 +92,7 @@ type Chip8 struct {
 	nnn         uint16 // Stores addresses from opcodes
 
 	wg *sync.WaitGroup
+	breakInputHold bool
 }
 
 func (ch *Chip8) Inspect() (state string) {
@@ -149,7 +150,7 @@ func (ch *Chip8) Reset() {
 	for i, _ := range ch.keyboard {
 		ch.keyboard[i] = false
 	}
-
+	ch.breakInputHold = false
 }
 
 func (ch *Chip8) SetBeepHandler(callback func(bool)) {
@@ -169,6 +170,10 @@ func (ch *Chip8) Resume() {
 		ch.wg.Done()
 		ch.wg = nil
 	}
+}
+
+func (ch* Chip8) Break() {
+	ch.breakInputHold = true
 }
 
 func (ch *Chip8) LoadRom(filepath string) error {
@@ -357,7 +362,7 @@ func (ch *Chip8) executeOpcode() error {
 		case 0x0A: // Fx0A - LD Vx, K
 			// TODO: remove debug output and write proper tests
 			log.Print("Waiting for keypress ")
-			for {
+			for ch.breakInputHold != true {
 				if ch.lastKey == nil {
 					time.Sleep(time.Microsecond * 1600) // ~700 Hz
 					continue

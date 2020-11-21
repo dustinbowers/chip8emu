@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/dustinbowers/chip8emu/chip8"
 	"github.com/dustinbowers/chip8emu/ui"
 	"github.com/veandco/go-sdl2/sdl"
@@ -53,7 +54,7 @@ func main() {
 		for {
 			_, err = emu.EmulateCycle()
 			if err != nil {
-				log.Fatalf("emu.EmulateCycle: %v", err)
+				panic(fmt.Sprintf("emu.EmulateCycle: %v", err))
 			}
 			if running == false {
 				return
