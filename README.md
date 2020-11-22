@@ -93,7 +93,7 @@ See: https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
 ```
 
 ### Stack
-Typically the stack is 48 bytes (12 levels * 4 address bits each). This implementation supports 16 levels
+Typically the stack is 48 bytes (12 levels * 4 bytes each). This implementation supports 16 levels
 
 ### Timers (60hz)
 
