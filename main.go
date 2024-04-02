@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/dustinbowers/chip8emu/chip8"
-	"github.com/dustinbowers/chip8emu/ui"
-	"github.com/veandco/go-sdl2/sdl"
 	"log"
 	"os"
 	"time"
+
+	"github.com/dustinbowers/chip8emu/chip8"
+	"github.com/dustinbowers/chip8emu/ui"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 const (
@@ -20,9 +21,9 @@ var keyMap map[int]uint8
 func main() {
 	var romPath string
 	romPath = "roms/games/Space Invaders [David Winter].ch8"
-	//romPath = "roms/programs/Keypad Test [Hap, 2006].ch8"
-	//romPath = "roms/programs/Clock Program [Bill Fisher, 1981].ch8"
-	//romPath = "roms/programs/BC_test.ch8"
+	// romPath = "roms/programs/Keypad Test [Hap, 2006].ch8"
+	// romPath = "roms/programs/Clock Program [Bill Fisher, 1981].ch8"
+	// romPath = "roms/programs/BC_test.ch8"
 	if len(os.Args) == 2 {
 		romPath = os.Args[1]
 	}
@@ -56,7 +57,7 @@ func main() {
 			if err != nil {
 				panic(fmt.Sprintf("emu.EmulateCycle: %v", err))
 			}
-			if running == false {
+			if !running {
 				return
 			}
 			time.Sleep(time.Microsecond * delay * 1000) // ~700 Hz
@@ -73,7 +74,6 @@ func main() {
 			case *sdl.QuitEvent:
 				println("Quit")
 				running = false
-				break
 			case *sdl.KeyboardEvent:
 				if t.Keysym.Sym == sdl.K_ESCAPE {
 					running = false
